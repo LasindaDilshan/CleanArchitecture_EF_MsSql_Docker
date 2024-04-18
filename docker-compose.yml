@@ -1,0 +1,34 @@
+version: '3.4'
+
+
+services:
+  sql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql-server
+    environment:
+      SA_PASSWORD: YourStrong!Passw0rd
+      ACCEPT_EULA: Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - app-network
+
+  sapi:
+    image: ${DOCKER_REGISTRY-}sapi
+    build:
+      context: .
+      dockerfile: CleanMovie.SApi/Dockerfile
+    depends_on:
+      - sql-server
+    ports:
+      - "8080:80"
+    networks:
+      - app-network
+volumes:
+  sql_data:
+networks:
+  app-network:
+    driver: bridge
+ 
